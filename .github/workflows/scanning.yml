@@ -23,7 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@master # For node projects, change accordingly
       - name: Run Snyk to check for vulnerabilities
-        uses: snyk/action/node@master
+        uses: snyk/actions/setup@master
         env:
           SONAR_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
