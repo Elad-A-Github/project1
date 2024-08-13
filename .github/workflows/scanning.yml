@@ -1,16 +1,13 @@
-name: Build
-on:
-  push:
+name: DevSecOps Pipeline
+on: push
     branches:
       - main
-  pull_request:
-    types: [opened, synchronize, reopened]
 jobs:
   sonarcloud:
     name: SonarCloud
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: SonarCloud Scan
@@ -18,3 +15,26 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+  snyk:
+    needs: SonarCloud
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master # For node projects, change accordingly
+      - name: Run Snyk to check for vulnerabilities
+        uses: snyk/action/node@master
+        env:
+          SONAR_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          command: monitor
+          
+  zop_scan:
+    name: zap
+    needs: snyk
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master # For node projects, change accordingly
+      - name: Checkout
+        uses: snyk/action/checkout@v2
+        with:
+          ref: master
