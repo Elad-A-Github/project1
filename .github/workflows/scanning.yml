@@ -36,6 +36,6 @@ jobs:
     steps:
       - uses: actions/checkout@master # For node projects, change accordingly
       - name: Checkout
-        uses: snyk/action/checkout@v2
+        uses: zaproxy/action-full-scan@v0.10.0
         with:
           ref: master
